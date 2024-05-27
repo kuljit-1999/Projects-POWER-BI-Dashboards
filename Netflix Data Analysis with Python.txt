@@ -1,0 +1,76 @@
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans, AffinityPropagation
+import matplotlib.pyplot as plt
+import seaborn as sns
+#matplotlib inline
+import warnings
+warnings.filterwarnings("ignore")
+import plotly as py
+import plotly.graph_objs as go
+import os
+py.offline.init_notebook_mode(connected = True)
+#print(os.listdir("../input"))
+import datetime as dt
+#import missingno as msno
+#plt.rcParams['figure.dpi'] = 140
+
+# Create subplots
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+df = pd.read_csv('C:\\Users\\kkaur23\\Downloads\\archive (3)\\netflix_data.csv', encoding='unicode_escape')
+#####DATA Cleaning 
+df.head(3)
+#check the Data types of columns
+df.info()
+#number of columns in Dataset
+df.shape
+# Number of null records in each column
+pd.isnull(df).sum()
+# remove all the null records from dataset
+df.dropna(inplace=True)
+
+df.shape
+##############################DATA Visualization#######################################################
+fig = make_subplots(rows=3, cols=2, subplot_titles=[
+    'Content Distribution by Type', 
+    'Top 10 Genres on Netflix', 
+    'Number of Shows/Movies Added Each Year', 
+    'Top 10 Countries Producing Netflix Content', 
+    'Top 10 Directors on Netflix', 
+    'Average Duration of Movies and TV Shows'
+])
+
+# Content Distribution by Type
+type_distribution = df['type'].value_counts()
+fig.add_trace(go.Bar(x=type_distribution.index, y=type_distribution.values, name='Type'), row=1, col=1)
+
+# Content Distribution by Genre
+genre_distribution = df['genre'].value_counts().head(10)  # Top 10 genres
+fig.add_trace(go.Bar(x=genre_distribution.index, y=genre_distribution.values, name='Genre', marker_color='green'), row=1, col=2)
+
+# Yearly Content Addition
+yearly_addition = df['release_year'].value_counts().sort_index()
+fig.add_trace(go.Scatter(x=yearly_addition.index, y=yearly_addition.values, mode='lines+markers', name='Yearly Addition'), row=2, col=1)
+
+# Content Distribution by Country
+country_distribution = df['country'].value_counts().head(10)  # Top 10 countries
+fig.add_trace(go.Bar(x=country_distribution.index, y=country_distribution.values, name='Country', marker_color='purple'), row=2, col=2)
+
+# Most Prolific Directors
+prolific_directors = df['director'].value_counts().head(10)
+fig.add_trace(go.Bar(x=prolific_directors.index, y=prolific_directors.values, name='Director', marker_color='red'), row=3, col=1)
+
+# Average Duration of Movies and TV Shows
+avg_duration = df.groupby('type')['duration'].mean()
+fig.add_trace(go.Bar(x=avg_duration.index, y=avg_duration.values, name='Avg Duration', marker_color=['cyan', 'magenta']), row=3, col=2)
+
+# Update layout
+fig.update_layout(height=1200, width=1000, title_text="Netflix Data Analysis Dashboard", showlegend=False)
+
+# Show the plot
+fig.show() 
